@@ -8,8 +8,8 @@ class NN_Inside_Layer:
         self.input_size = input_size
         self.number_neurons = number_of_neurons
         self.activation = activation
-        self.weights = np.full((input_size, number_of_neurons),1)
-        self.biases = np.zeros(number_of_neurons)
+        self.weights = self.glorot_uniform((input_size, number_of_neurons))
+        self.biases = self.glorot_uniform(number_of_neurons)
         self.input_values = np.zeros(input_size)
         self.output_values = np.zeros(number_of_neurons)
     
@@ -17,10 +17,11 @@ class NN_Inside_Layer:
         
         return np.matmul(x, self.weights)+self.biases
     
-    def gorot_uniform(self, shape)
+    def glorot_uniform(self, shape):
         
         limit = np.sqrt(6/(self.input_size+self.number_neurons))
-        return np.random.rand(3,2)
+        
+        return np.random.random_sample(shape)*limit -limit
     
     def sigmoid_activation(self,x):
         
@@ -91,10 +92,6 @@ class NN_Inside_Layer:
         for i in range(self.number_neurons):
             self.biases[i] = self.biases[i] - lr* self.bias_loss[i]
     
-
-
-
-
 
 
 class NN_Network:
