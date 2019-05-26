@@ -203,12 +203,12 @@ class NN_Network:
         else:
             return -1/self.nn_output
     
-    def fit(self, x, y):
+    def fit(self, x, y, dloss = None):
         
         self.predict(x)
         d_loss = np.zeros(self.output_size)
         self.total_loss = 0
-        
+
         if self.loss == "categorical_cross_entropy":
             d_loss = self.compute_categorical_cross_entropy_loss_derivative(y)
             self.total_loss = self.compute_categorical_cross_entropy_loss(y)/self.output_size
@@ -217,10 +217,15 @@ class NN_Network:
             self.total_loss = self.compute_mse_loss(y).sum()/self.output_size
         elif self.loss == "binary_cross_entropy":
             d_loss = self.compute_binary_cross_entropy_loss_derivate(y)
-            self.total_loss = self.compute_binary_cross_entropy_loss(y)
+            self.total_loss = self.compute_binary_cross_entropy_loss(y) 
         else:
             raise Exception("loss not specified correctly")
         
+        ########### Inputing gradiente manually #######        
+        if dloss != None:
+
+            assert len(dloss) == self.output_size
+            d_loss = dloss
         
         self.apply_loss(d_loss)
         return self.total_loss
