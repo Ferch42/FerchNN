@@ -3,8 +3,9 @@ from scipy.special import expit
 
 class NN_Inside_Layer:    
     
-    def __init__(self, input_size, number_of_neurons = 30 , activation = "sigmoid"):
+    def __init__(self, input_size, number_of_neurons = 30 , activation = "sigmoid", lr =0.001):
         
+        self.lr = lr
         self.input_size = input_size
         self.number_neurons = number_of_neurons
         self.activation = activation
@@ -81,22 +82,22 @@ class NN_Inside_Layer:
         
         return d_activation
         
-    def apply_gradients(self, lr = 0.001):
+    def apply_gradients(self):
         
         # Applies gradient descent to the weights
         for i in range(self.input_size):
             for j in range(self.number_neurons):
-                self.weights[i][j] = self.weights[i][j] - lr*self.weight_loss[i][j]
+                self.weights[i][j] = self.weights[i][j] - self.lr*self.weight_loss[i][j]
                 
         # Applies gradient descent to the biases:
         for i in range(self.number_neurons):
-            self.biases[i] = self.biases[i] - lr* self.bias_loss[i]
+            self.biases[i] = self.biases[i] - self.lr* self.bias_loss[i]
     
 
 
 class NN_Network:
     
-    def __init__(self, input_size, output_size, number_of_layers = 3, neurons_per_layer = 30, activation = "sigmoid", loss = "binary_cross_entropy"):
+    def __init__(self, input_size, output_size, number_of_layers = 3, neurons_per_layer = 30, lr =0.001,activation = "sigmoid", loss = "binary_cross_entropy"):
         
         self.layers = []
         self.input_size = input_size
@@ -106,10 +107,10 @@ class NN_Network:
         self.total_loss = 0
         
         # Adding layers
-        self.layers.append(NN_Inside_Layer(input_size, number_of_neurons = neurons_per_layer))
+        self.layers.append(NN_Inside_Layer(input_size, number_of_neurons = neurons_per_layer, lr = lr))
         for _ in range(number_of_layers-2):
-            self.layers.append(NN_Inside_Layer(neurons_per_layer, number_of_neurons = neurons_per_layer))
-        self.layers.append(NN_Inside_Layer(neurons_per_layer, number_of_neurons = output_size, activation = activation))
+            self.layers.append(NN_Inside_Layer(neurons_per_layer, number_of_neurons = neurons_per_layer, lr = lr))
+        self.layers.append(NN_Inside_Layer(neurons_per_layer, number_of_neurons = output_size, activation = activation, lr= lr))
          
     def predict(self, x):
         
@@ -205,6 +206,14 @@ class NN_Network:
     
     def fit(self, x, y, dloss = None):
         
+        ########### Inputing gradient manually ###########        
+        if dloss != None:
+            assert len(dloss) == self.output_size
+            d_loss = dloss
+            self.apply_loss(d_loss)
+            return 0
+        ##################################################
+
         self.predict(x)
         d_loss = np.zeros(self.output_size)
         self.total_loss = 0
@@ -221,11 +230,6 @@ class NN_Network:
         else:
             raise Exception("loss not specified correctly")
         
-        ########### Inputing gradiente manually #######        
-        if dloss != None:
 
-            assert len(dloss) == self.output_size
-            d_loss = dloss
-        
         self.apply_loss(d_loss)
         return self.total_loss
