@@ -97,7 +97,7 @@ class NN_Inside_Layer:
 
 class NN_Network:
     
-    def __init__(self, input_size, output_size, number_of_layers = 3, neurons_per_layer = 30, lr =0.000001,activation = "sigmoid", loss = "binary_cross_entropy"):
+    def __init__(self, input_size, output_size, number_of_layers = 3, neurons_per_layer = 30, lr =0.00000005,activation = "sigmoid", loss = "binary_cross_entropy"):
         
         self.layers = []
         self.input_size = input_size
