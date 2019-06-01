@@ -9,7 +9,7 @@ class NN_Inside_Layer:
         self.input_size = input_size
         self.number_neurons = number_of_neurons
         self.activation = activation
-        self.weights = np.full((input_size, number_of_neurons), 1)
+        self.weights = np.full((input_size, number_of_neurons),1)
         self.biases = self.glorot_uniform(number_of_neurons)
         self.input_values = np.zeros(input_size)
         self.output_values = np.zeros(number_of_neurons)
@@ -97,7 +97,7 @@ class NN_Inside_Layer:
 
 class NN_Network:
     
-    def __init__(self, input_size, output_size, number_of_layers = 3, neurons_per_layer = 30, lr =0.00000005,activation = "sigmoid", loss = "binary_cross_entropy"):
+    def __init__(self, input_size, output_size, number_of_layers = 3, neurons_per_layer = 30, lr =0.001,activation = "sigmoid", loss = "binary_cross_entropy"):
         
         self.layers = []
         self.input_size = input_size
