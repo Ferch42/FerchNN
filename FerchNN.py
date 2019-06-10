@@ -3,17 +3,21 @@ from scipy.special import expit
 
 class NN_Inside_Layer:    
     
-    def __init__(self, input_size, number_of_neurons = 30 , activation = "sigmoid", lr =0.001):
+    def __init__(self, input_size, number_of_neurons = 30 , activation = "sigmoid", lr =0.001, initalization = "glorot"):
         
         self.lr = lr
         self.input_size = input_size
         self.number_neurons = number_of_neurons
         self.activation = activation
-        self.weights = np.full((input_size, number_of_neurons),1)
+        self.weights = self.glorot_uniform((input_size, number_of_neurons))
         self.biases = self.glorot_uniform(number_of_neurons)
         self.input_values = np.zeros(input_size)
         self.output_values = np.zeros(number_of_neurons)
-    
+        
+        if initalization == "ones":
+            self.weights = np.ones((input_size, number_of_neurons))
+            self.biases = np.ones(number_of_neurons)
+        
     def sum_input(self,x):
         
         return np.matmul(x, self.weights)+self.biases
@@ -152,8 +156,26 @@ class NN_Network:
         for layer in self.layers[::-1]:
             layer.backpropagation_wrt_weights(backward_pass)
             backward_pass = layer.backpropagation_wrt_layers(backward_pass)
-            layer.apply_gradients()
+            #layer.apply_gradients()
         
+    def get_gradients(self):
+        
+        #### GENERATES THE GRADIENT #####
+        gradients = []
+        for layer in self.layers:
+            gradients.append((layer.weight_loss, layer.bias_loss))
+
+        return gradients
+
+    def apply_gradients_manually(self, gradients):
+        
+        #### GRADIENTS MUST BE A TUPLE (weights, biases)
+        assert len(gradients) == len(self.layers)
+
+        for i , layer in enumerate(self.layers):
+            layer.weight_loss = gradients[i][0]
+            layer.bias_loss = gradients[i][1]
+
     def compute_categorical_cross_entropy_loss(self, y):
     
         assert len(y) == self.output_size
